@@ -324,6 +324,23 @@ python do_populate_cyclonedx() {
         # of duplicating its CPE/version-range parsing.
         script = os.path.join(d.getVar('COREBASE'), 'scripts', 'contrib',
                                'improve_kernel_cve_report.py')
+        # improve_kernel_cve_report.py imports packaging.version, which is
+        # not part of the host tools bitbake requires. Fall back to the copy
+        # pip vendors (present wherever pip is, e.g. the kas container) and
+        # fail with a clear message otherwise.
+        import sys
+        try:
+            import packaging.version
+        except ImportError:
+            try:
+                import pip._vendor.packaging as packaging
+                import pip._vendor.packaging.version
+            except ImportError:
+                bb.fatal("CYCLONEDX_VEX_ADD_KERNEL_CVE needs the Python "
+                         "'packaging' module in the host Python used by bitbake")
+            sys.modules['packaging'] = packaging
+            sys.modules['packaging.version'] = packaging.version
+
         spec = importlib.util.spec_from_file_location('improve_kernel_cve_report', script)
         ikcr = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(ikcr)

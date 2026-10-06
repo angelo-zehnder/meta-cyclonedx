@@ -318,7 +318,10 @@ CYCLONEDX_VEX_ADD_KERNEL_CVE = "1"
 
 This is disabled by default (`"0"`) and only applies to whichever recipe
 provides `virtual/kernel`. No extra configuration is required: the CVE
-database it relies on is fetched automatically.
+database it relies on is fetched automatically. The host Python running
+bitbake needs the `packaging` module (or pip, whose vendored copy is used as
+a fallback); kas container images up to 4.x (Debian bookworm), for example,
+ship only the latter, kas 5.x images (Debian trixie) have both.
 
 ### sbom-cve-check Results
 
